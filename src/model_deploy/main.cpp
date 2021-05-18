@@ -510,13 +510,13 @@ void Angle_main(void)
   char tilt_angle[200];
   int16_t accInit[3] = {0};
 
-  while (mode2 == 0) {
+  //while (mode2 == 0) {
     AccInit(accInit);
     uLCD.cls();
     uLCD.textbackground_color(0x000000);
     angle_over = 0;
     led3 = 1;
-    while ((angle_over == 0) && (mode2 == 0)) {
+    while (mode2 == 0) {
       BSP_ACCELERO_AccGetXYZ(accData);
       V_init = sqrt(accInit[0] * accInit[0]
                     + accInit[1] * accInit[1]
@@ -544,12 +544,16 @@ void Angle_main(void)
           angle_over = 1;
         }
       }
+      if ((angle_over == 1) && (mode2 == 0)) {
+        mqtt_queue.call(&publish_message, client_global, tilt_angle, 1);
+        angle_over = 0;
+      }
     }
-    if (mode2 == 0) {
+    /*if (mode2 == 0) {
       mqtt_queue.call(&publish_message, client_global, tilt_angle, 1);
-    }
-    ThisThread::sleep_for(5s);
-  }
+    }*/
+    //ThisThread::sleep_for(5s);
+  //}
 }
 
 void AccInit(int16_t *accInit)
